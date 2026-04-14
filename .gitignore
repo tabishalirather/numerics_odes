@@ -1,0 +1,6 @@
+.venv/
+build_dir/
+__pycache__/
+*.o
+*.out
+.idea/
