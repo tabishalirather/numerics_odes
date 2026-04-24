@@ -1,4 +1,5 @@
 # from collections.abc import Iterator
+from logging import warn, warning
 
 import numpy as np
 # from numpy.random.c_distributions import random_standard_t
@@ -9,7 +10,7 @@ from scipy.integrate import odeint, solve_ivp
 # from scipy.stats import alpha
 
 
-def ode_system(y, t, pa, pb, alpha, beta):
+def ode_system(y, t, alpha, beta):
     """
     – α, dealing with human–zombie encounters that remove zombies. Zombie removal quotient
     – β, dealing with human–zombie encounters that convert humans to zombies. Human infection quotient
@@ -19,13 +20,15 @@ def ode_system(y, t, pa, pb, alpha, beta):
     """
 
     # alpha = 0.5
-    alpha = alpha + pa * alpha
-    # beta = 0.6
-    beta = beta + beta * pb
+    # alpha = alpha*(1 + pa)
+    # # warning(f"Uncertainity in alpha is: {pa}")
+    # # beta = 0.6
+    # beta = beta*(1 + pb)
+    # warning(f"Uncertainity in alpha is: {pb}")
     h_t, z_t, r_t = y
-    # h_t = np.linspace(0, 10, 10)
-    # z_t = np.linspace(0, 10, 10)
-    # r_t = np.linspace(0, 10, 10)
+    # h_t = max(h_t, 0.0)
+    # z_t = max(z_t, 0.0)
+    # r_t = max(r_t, 0.0)
     dh_dt = -beta * h_t * z_t
     dz_dt = (beta * h_t * z_t) - (alpha * h_t * z_t)
     dr_dt = alpha * h_t * z_t
@@ -55,8 +58,8 @@ def zombie(strategy, pa, pb):
     strategy : integer
         mitigation strategy
         0 : no intervention
-        1 : training and arming humans
-        2 : vaccination of humans 
+        1 : training and arming humans -> ##increase alpha
+        2 : vaccination of humans -> ##reduce beta
     pa : real number
         uncertainty in the paramater alpha (= efficiency of humans killing zombies)
     pb : real number
@@ -80,7 +83,7 @@ def zombie(strategy, pa, pb):
     # edit the code here#
     ####################
 
-    initial_humans = 500
+    initial_humans = 1000
     initial_zombies = 10
     t = np.linspace(0, 1, 101)
     ALPHA = 0.5  # efficientcy of killling zombies, increased by trainign in arming by 50%
@@ -97,10 +100,22 @@ def zombie(strategy, pa, pb):
     else:
         alpha = ALPHA
         beta = BETA
+
+    alpha = alpha * (1 + pa)
+    beta = beta * (1 + pb)
+
+
     y_0 = [initial_humans, initial_zombies, 0]
-    x = odeint(ode_system, y_0, t, args=(pa, pb, alpha, beta))
-    h_t = x[:, 0]
-    z_t = x[:, 1]
-    r_t = x[:, 2]
+    x = odeint(
+        ode_system,
+        y_0,
+        t,
+        args=(alpha, beta),
+        rtol = 1e-9,
+        atol=1e-12
+    )
+    # h_t = x[:, 0]
+    # z_t = x[:, 1]
+    # r_t = x[:, 2]
 
     return t, x
