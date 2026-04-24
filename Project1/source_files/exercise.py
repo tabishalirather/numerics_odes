@@ -1,14 +1,8 @@
 # from collections.abc import Iterator
 from logging import warn, warning
-
 import numpy as np
 # from numpy.random.c_distributions import random_standard_t
-from scipy.integrate import odeint
 from scipy.integrate import odeint, solve_ivp
-
-
-# from scipy.stats import alpha
-
 
 def ode_system(y, t, alpha, beta):
     """
@@ -18,17 +12,7 @@ def ode_system(y, t, alpha, beta):
     - dz_dt =  beta*h_t*z_t - alpha*h_t*z_t
     - dr_dt = alpha*h_t*z_t
     """
-
-    # alpha = 0.5
-    # alpha = alpha*(1 + pa)
-    # # warning(f"Uncertainity in alpha is: {pa}")
-    # # beta = 0.6
-    # beta = beta*(1 + pb)
-    # warning(f"Uncertainity in alpha is: {pb}")
     h_t, z_t, r_t = y
-    # h_t = max(h_t, 0.0)
-    # z_t = max(z_t, 0.0)
-    # r_t = max(r_t, 0.0)
     dh_dt = -beta * h_t * z_t
     dz_dt = (beta * h_t * z_t) - (alpha * h_t * z_t)
     dr_dt = alpha * h_t * z_t
@@ -85,24 +69,28 @@ def zombie(strategy, pa, pb):
 
     initial_humans = 1000
     initial_zombies = 10
+    strategy_1_effect = 0.5
+    strategy_2_effect = -0.5
+    error_alpha = pa
+    error_beta = pb
     t = np.linspace(0, 1, 101)
-    ALPHA = 0.5  # efficientcy of killling zombies, increased by trainign in arming by 50%
+    alpha_baseline = 0.5  # efficientcy of killling zombies, increased by trainign in arming by 50%
     # alpha_list = [alpha, alpha + (0.5 * alpha)]
-    BETA = 0.6  # infection rate, reduced by half with vaccines.
+    beta_baseline = 0.6  # infection rate, reduced by half with vaccines.
     # beta_list = [beta, beta-(0.5*beta)] #reduce beta by half with strategy
 
     if (1 == strategy):
-        alpha = ALPHA + (0.5 * ALPHA)
-        beta = BETA
+        alpha = alpha_baseline + ( strategy_1_effect * alpha_baseline)
+        beta = beta_baseline
     elif (2 == strategy):
-        alpha = ALPHA
-        beta = BETA - (0.5 * BETA)
+        alpha = alpha_baseline
+        beta = beta_baseline - (strategy_1_effect * beta_baseline)
     else:
-        alpha = ALPHA
-        beta = BETA
+        alpha = alpha_baseline
+        beta = beta_baseline
 
-    alpha = alpha * (1 + pa)
-    beta = beta * (1 + pb)
+    alpha = alpha * (1 + error_alpha)
+    beta = beta * (1 + error_beta)
 
 
     y_0 = [initial_humans, initial_zombies, 0]
@@ -111,11 +99,6 @@ def zombie(strategy, pa, pb):
         y_0,
         t,
         args=(alpha, beta),
-        rtol = 1e-9,
-        atol=1e-12
     )
-    # h_t = x[:, 0]
-    # z_t = x[:, 1]
-    # r_t = x[:, 2]
 
     return t, x
