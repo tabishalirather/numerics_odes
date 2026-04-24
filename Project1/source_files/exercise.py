@@ -1,4 +1,4 @@
-from collections.abc import Iterator
+# from collections.abc import Iterator
 
 import numpy as np
 # from numpy.random.c_distributions import random_standard_t
@@ -9,26 +9,42 @@ from scipy.integrate import odeint, solve_ivp
 # from scipy.stats import alpha
 
 
-def ode_system(t, h_t, z_t, r_t, pa=0, pb=0,):
+def ode_system(y, t, pa, pb, alpha, beta):
     """
-    – α, dealing with human–zombie encounters that remove zombies.
-    – β, dealing with human–zombie encounters that convert humans to zombies
+    – α, dealing with human–zombie encounters that remove zombies. Zombie removal quotient
+    – β, dealing with human–zombie encounters that convert humans to zombies. Human infection quotient
     - dh_dt = -beta*h_t*z_t
     - dz_dt =  beta*h_t*z_t - alpha*h_t*z_t
     - dr_dt = alpha*h_t*z_t
     """
 
-    beta = pb * 1
-    alpha = pa * 1
+    # alpha = 0.5
+    alpha = alpha + pa * alpha
+    # beta = 0.6
+    beta = beta + beta * pb
+    h_t, z_t, r_t = y
     # h_t = np.linspace(0, 10, 10)
     # z_t = np.linspace(0, 10, 10)
     # r_t = np.linspace(0, 10, 10)
     dh_dt = -beta * h_t * z_t
-    dz_dt = beta * h_t * z_t - alpha * h_t * z_t
-    dr_dt = alpha*h_t*z_t
+    dz_dt = (beta * h_t * z_t) - (alpha * h_t * z_t)
+    dr_dt = alpha * h_t * z_t
+    return [dh_dt, dz_dt, dr_dt]
+
 
 def zombie(strategy, pa, pb):
     """
+    Defining Vocab:
+        1. h_t: humans
+        2. z_t: zombies
+        3. r_t: removed/dead zombine
+        dh_dt = -beta*h_t*z_t
+        dz_dt =  beta*h_t*z_t - alpha*h_t*z_t
+        dr_dt = alpha*h_t*z_t
+
+    x[i,0] : h_t[i]
+    x[i,1] : z_t[i]
+    x[i,2] : r_t[i]
     zombie(strategy,pa,pb)
     
     This function computes the evolution of the populations of humans and zombies 
@@ -57,33 +73,34 @@ def zombie(strategy, pa, pb):
     
     Example
     -----------------
-    >>> t, x = zombie(0,0,0)        # Baseline scenario without intervention and with given values of alpha and beta  
-    >>> t, x = zombie(1,-0.25,0.25) # Strategy 1 in worst case scenario where alpha is 25% decreased and beta is 25% increased.  
+     >>> t, x = zombie(0,0,0)        # Baseline scenario without intervention and with given values of alpha and beta
+     >>> t, x = zombie(1,-0.25,0.25) # Strategy 1 in worst case scenario where alpha is 25% decreased and beta is 25% increased.
     """
-    '''
-    Defining Vocab: 
-    1. h_t: humans 
-    2. z_t: zombies
-    3. r_t: removed/dead zombine 
-    dh_dt = -beta*h_t*z_t
-    dz_dt =  beta*h_t*z_t - alpha*h_t*z_t
-    dr_dt = alpha*h_t*z_t
-    
-    x[i,0] : h_t[i]      
-    x[i,1] : z_t[i]      
-    x[i,2] : r_t[i]
-    '''
-
     ####################
     # edit the code here#
     ####################
-    t = np.linspace(0, 1, 100)
 
-    if (0 == strategy):
-        print("We did nothing")
-    elif (1 == strategy):
-        print("we used srategy 1, training and arming humans")
+    initial_humans = 500
+    initial_zombies = 10
+    t = np.linspace(0, 1, 101)
+    ALPHA = 0.5  # efficientcy of killling zombies, increased by trainign in arming by 50%
+    # alpha_list = [alpha, alpha + (0.5 * alpha)]
+    BETA = 0.6  # infection rate, reduced by half with vaccines.
+    # beta_list = [beta, beta-(0.5*beta)] #reduce beta by half with strategy
+
+    if (1 == strategy):
+        alpha = ALPHA + (0.5 * ALPHA)
+        beta = BETA
     elif (2 == strategy):
-        print("we used strategy 2, vaccinations.")
+        alpha = ALPHA
+        beta = BETA - (0.5 * BETA)
+    else:
+        alpha = ALPHA
+        beta = BETA
+    y_0 = [initial_humans, initial_zombies, 0]
+    x = odeint(ode_system, y_0, t, args=(pa, pb, alpha, beta))
+    h_t = x[:, 0]
+    z_t = x[:, 1]
+    r_t = x[:, 2]
 
-    return strategy
+    return t, x
