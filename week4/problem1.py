@@ -24,45 +24,56 @@ initial_time = 0
 end_time = 5
 t = np.linspace(0,end_time,100) # equidistant time grid
 
-def f(t, y, d=3):
-    return d*y - y**2
+def f(t, y, _d=d):
+    return _d*y - y**2
 
-y_euler = euler_explicit(initial_condition, t, f)
+euler_explicit_value = euler_explicit(initial_condition, t, f)
+y_analytic_value = y_analytic(t)
+print(euler_explicit_value)
+print(y_analytic_value)
 
-print(y_euler)
 
 plt.figure(1)
-plt.plot(t, y_euler, 'r', t, y_analytic(t), '--b')
+plt.plot(t, euler_explicit_value, 'r', t, y_analytic_value, '--b')
 plt.legend(['Explicit Euler', 'Analytic Soln'])
 plt.show()
 
-# t_end = 1
-# t_start = 0
-# time = np.linspace(t_start, t_end, 100)
-# i = 0
-# step_size_h = time[i+1] - time[i]
-#
-# x = [0]
-#
-# for j in range(1,len(time)):
-#     # print(i)
-#     x.append(x[0] + j*step_size_h)
-# # print(x)
-#
-# # here instead of x we have t.
-# y = [2] * len(time)
-# for i in range(1, len(time)):
-#     print(i)
-#     print((y[i] + step_size_h * (3*y[i]) - y[i]**2))
-#     y.append((y[i] + step_size_h * (3*y[i]) - y[i]**2))
-# print(y)
-#
-#
-# # y[i+1] = y[i] + h*f(x_i,y_i)
-# # f(x_i, y_i) = 3y - y^2
-# # x[0] = 0; y[0] = y0; f(x_0,y_0) = 3y0 - y0^2
-# # print(time)
-# # print(step_size_h)
-# # print("")
-# # for t in time:
-# #     print(t)
+
+# Global ERROR
+# for n in range(1,len(t)):
+global_error = y_analytic_value - euler_explicit_value
+plt.figure(2)
+plt.plot(t, global_error, '--')
+plt.show()
+
+max_global_error = np.max(np.abs(global_error))
+print(f"max_global_error is: {max_global_error}")
+
+# Lipschitz constant:
+L = d+2*(np.max(np.abs(y_analytic_value)))
+K = np.max(np.abs((d-2*y_analytic_value*y_analytic_value)*(d*y_analytic_value)-y_analytic_value**2))
+C = np.exp(L*(end_time - initial_time)) * K/2 * (end_time-initial_time)
+h_step_size = t[1]-t[0]
+print(f"K: {K}")
+print(f"L: {L}")
+print(f"L: {C}")
+
+# Now plot this:
+plt.figure(2)
+plt.semilogy(t, np.abs(global_error), 'r', t, C*h_step_size+0*t, '--b')
+plt.show()
+
+num_step = [100, 1000, 1000]
+errors_array = np.zeros(len(num_step))
+step_sizes_h = np.zeros(len(num_step))
+
+for i in range(len(num_step)):
+    t = np.linspace(initial_time, end_time, num_step[i])
+    y_euler = euler_explicit(initial_condition, t, f)
+    y_analytic_value = y_analytic(t)
+    errors_array[i] = np.max(np.abs(y_analytic_value - y_euler))
+    step_sizes_h[i] = t[1] - t[0]
+
+plt.figure(3)
+plt.loglog(h_step_size, errors_array)
+plt.show()
