@@ -18,7 +18,6 @@ def ode_system(y, t, alpha, beta):
     dr_dt = alpha * h_t * z_t
     return [dh_dt, dz_dt, dr_dt]
 
-
 def zombie(strategy, pa, pb):
     """
     Defining Vocab:
@@ -85,10 +84,11 @@ def zombie(strategy, pa, pb):
     elif (2 == strategy):
         alpha = alpha_baseline
         beta = beta_baseline - (strategy_1_effect * beta_baseline)
-    else:
+    elif(0 == strategy):
         alpha = alpha_baseline
         beta = beta_baseline
-
+    else:
+        print("Invalid Strategy: Enter 0, 1 or 2 only");
     alpha = alpha * (1 + error_alpha)
     beta = beta * (1 + error_beta)
 
