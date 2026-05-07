@@ -1,8 +1,9 @@
-#from collections.abc import Iterator
-#from logging import warn, warning
+# from collections.abc import Iterator
+# from logging import warn, warning
 import numpy as np
-#from numpy.random.c_distributions import random_standard_t
+# from numpy.random.c_distributions import random_standard_t
 from scipy.integrate import odeint, solve_ivp
+
 
 def ode_system(y, t, alpha, beta):
     """
@@ -17,6 +18,7 @@ def ode_system(y, t, alpha, beta):
     dz_dt = (beta * h_t * z_t) - (alpha * h_t * z_t)
     dr_dt = alpha * h_t * z_t
     return [dh_dt, dz_dt, dr_dt]
+
 
 def zombie(strategy, pa, pb):
     """
@@ -79,19 +81,18 @@ def zombie(strategy, pa, pb):
     # beta_list = [beta, beta-(0.5*beta)] #reduce beta by half with strategy
 
     if (1 == strategy):
-        alpha = alpha_baseline + ( strategy_1_effect * alpha_baseline)
+        alpha = alpha_baseline + (strategy_1_effect * alpha_baseline)
         beta = beta_baseline
     elif (2 == strategy):
         alpha = alpha_baseline
         beta = beta_baseline - (strategy_1_effect * beta_baseline)
-    elif(0 == strategy):
+    elif (0 == strategy):
         alpha = alpha_baseline
         beta = beta_baseline
     else:
         print("Invalid Strategy: Enter 0, 1 or 2 only");
     alpha = alpha * (1 + error_alpha)
     beta = beta * (1 + error_beta)
-
 
     y_0 = [initial_humans, initial_zombies, 0]
     x = odeint(
