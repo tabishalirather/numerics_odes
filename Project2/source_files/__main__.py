@@ -2,10 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 from exercise import *
+import os
+
 
 #---------------------------------------------------------------------
 # main program
 #---------------------------------------------------------------------
+
 
 V = 25   # biochemical reactor volume [m^3]                  
 Q1 = 2.5 # discharge of the first pipe [m^3/min]
@@ -40,13 +43,30 @@ for i in range(len(h)):
   t = np.arange(t0,te,h_)
   t = np.append(t,te)
       
-  y_app = odeint(f,y0,t, tfirst = True)              
-  y_euler_expl = euler_expl(f,y0,t)  
-  y_euler_impr = euler_impr(f,y0,t)   
+  y_app = odeint(f,y0,t, tfirst = True)
+  # y1 = y_app[1]
+  print(f"y_app: {y_app[:5]}")
+
+  y_euler_expl = euler_expl(f,y0,t)
+  if y_euler_expl is not None: print(f"y_euler_expl: {y_euler_expl[:5]}")
+  else: print("y_euler_expl is empty")
+
+  y_euler_impr = euler_impr(f,y0,t)
+  if y_euler_impr is not None: print(f"y_euler_impr: {y_euler_impr[:5]}")
+  else: print("y_euler_impr is empty")
+
   y_AB2 = twostep(f,[],y0,[],t,a_AB2,b_AB2)
-  y_AM2 = twostep(f,Jf,y0,[],t,a_AM2,b_AM2)        
+  if y_AB2 is not None: print(f"f{y_AB2}: {y_AB2[:5]}")
+  else: print("y_ABE is empty")
+
+  y_AM2 = twostep(f,Jf,y0,[],t,a_AM2,b_AM2)
+  if y_AM2 is not None: print(f"y_AME: {y_AM2[:5]}")
+  else: print("y_AME is emtpy")
+
   y_BDF2 = twostep(f,Jf,y0,[],t,a_BDF2,b_BDF2)
-            
+  if y_BDF2 is not None: print(f"y_BDFE: {y_BDF2[:5]}")
+  else: print("y_BDF2 is empty")
+
   col = 2 
   # absolute error for vaccine product concentration
   cp_err[i,:] = np.array([np.max(np.abs(y_euler_expl[:,col] - y_app[:,col])), 
@@ -68,7 +88,16 @@ print('       BDF2 : ',y_BDF2[m,:])
 #--------------------------------------------------------------------------
 # plot concentrations c_z(t), c_C(t), c_P(t)  [for h(end)]
 #--------------------------------------------------------------------------
-path = "/home/student/result/" # <--- change this path to that of your folder
+
+path = "/mnt/36C22184C2214987/Coursework/TUHH/Numerics for ODEs/Code/Project2/results/"
+print(path)
+# path = f"{cwd}/results" # <--- change this path to that of your folder
+# if(os.path.exists(path) is False):
+#   print("new path created")
+#   path = os.path.join(path, 'results')
+# else:
+#   print("old path used")
+#   path = path
 fs = 15 # FontSize
 title = ['Virus concentration','Chemical concentration','Vaccine product concentration']
 ylabel = ['$c_Z$','$c_C$','$c_P$']
