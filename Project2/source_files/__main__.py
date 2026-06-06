@@ -41,46 +41,51 @@ for i in range(len(h)):
     h_ = h[i]
     t = np.arange(t0, te, h_)
     t = np.append(t, te)
-
     y_app = odeint(f, y0, t, tfirst=True)
     # y1_app_values.append(y_app[1])
 
     # y1 = y_app[1]
-    print(f"y_app: {y_app[:5]}")
-
+    # print(f"y_app: {y_app[:5]}")
+    # y1 = y_app[1]
+    # y1 = np.array(y1)
+    # print(f"this is what is being sent to twostep method as y1 param: {type(y1)}")
     y_euler_expl = euler_expl(f, y0, t)
     if y_euler_expl is not None:
-        print(f"y_euler_expl: {y_euler_expl[:5]}")
+        # print(f"y_euler_expl: {y_euler_expl[:5]}")
+        pass
     else:
         print("y_euler_expl is empty")
 
     y_euler_impr = euler_impr(f, y0, t)
     if y_euler_impr is not None:
-        print(f"y_euler_impr: {y_euler_impr[:5]}")
+        # print(f"y_euler_impr: {y_euler_impr[:5]}")
+        pass
     else:
         print("y_euler_impr is empty")
-
     y_AB2 = twostep(f, [], y0, [], t, a_AB2, b_AB2)
     if y_AB2 is not None:
-        print(f"f{y_AB2}: {y_AB2[:5]}")
+        # print(f"f{y_AB2}: {y_AB2[:5]}")
+        pass
     else:
         print("y_ABE is empty")
 
     y_AM2 = twostep(f, Jf, y0, [], t, a_AM2, b_AM2)
     if y_AM2 is not None:
-        print(f"y_AME: {y_AM2[:5]}")
+        # print(f"y_AME: {y_AM2[:5]}")
+        pass
     else:
         print("y_AME is emtpy")
 
     y_BDF2 = twostep(f, Jf, y0, [], t, a_BDF2, b_BDF2)
     if y_BDF2 is not None:
-        print(f"y_BDFE: {y_BDF2[:5]}")
+        pass
+        # return print(f"y_BDFE: {y_BDF2[:5]}")
     else:
         print("y_BDF2 is empty")
 
     col = 2
-    print(f"y_euler_expl[:, col] {(y_euler_expl[:10, col])}")
-    print(f"y_app[:, col]): ({y_app[10, col]})")
+    # print(f"y_euler_expl[:, col] {(y_euler_expl[:10, col])}")
+    # print(f"y_app[:, col]): ({y_app[10, col]})")
 
 
     # absolute error for vaccine product concentration
@@ -91,8 +96,8 @@ for i in range(len(h)):
                              np.max(np.abs(y_BDF2[:, col] - y_app[:, col]))])
 
 
-    print(f"y1 using odeint is: {y_app[1]}")
-    print(f"y1 using y_AB2 is: {y_AB2[1]}")
+    # print(f"y1 using odeint is: {y_app[1]}")
+    # print(f"y1 using y_AB2 is: {y_AB2[1]}")
 
 # Display y(te) for final step size
 print(f"cp_err: {cp_err}")
@@ -126,10 +131,10 @@ fname = ['c_Z.png', 'c_C.png', 'c_P.png']
 for i in range(3):
     plt.figure()
     plt.rcParams.update({'font.size': fs})
-    # plt.plot(t,y_euler_expl[:,i],t,y_euler_impr[:,i],t,y_AB2[:,i],t,y_AM2[:,i],t,y_BDF2[:,i],t,y_app[:,i],'--k')
-    plt.plot(t, y_AM2[:, i], t, y_app[:, i], '--k')
-    # plt.legend(['Explicit Euler', 'Improved Euler', 'AB2', 'AM2', 'BDF2', 'odeint'], loc='best')
-    plt.legend(['other method', 'odeint'], loc='best')
+    plt.plot(t,y_euler_expl[:,i],t,y_euler_impr[:,i],t,y_AB2[:,i],t,y_AM2[:,i],t,y_BDF2[:,i],t,y_app[:,i],'--k')
+    # plt.plot(t, y_AM2[:, i], t, y_app[:, i], '--k')
+    plt.legend(['Explicit Euler', 'Improved Euler', 'AB2', 'AM2', 'BDF2', 'odeint'], loc='best')
+    # plt.legend(['other method', 'odeint'], loc='best')
     plt.title(title[i])
     plt.xlabel('t')
     plt.ylabel(ylabel[i])
