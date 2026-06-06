@@ -257,13 +257,13 @@ def f(t, c):
     # edit the code here#
     ####################
     cz, cc, cp = c
-    dcz_dt = (Q1 * cz0) - (Q3 * cz) - (k * cc * cz)
+    dcz_dt = ((Q1 * cz0)/V) - ((Q3 * cz)/V) - (k  * cc * cz)
     # print(f"dcz_dt : {dcz_dt}")
 
-    dcc_dt = (Q2 * cc0) - (Q3 * cc) - (k  * cc * cz)
+    dcc_dt = ((Q2 * cc0)/V) - ((Q3 * cc)/V) - (k  * cc * cz)
     # print(f"dcc_dt: {dcc_dt}")
 
-    dcp_dt = 0 - (Q3 * cp) + 2 * k * cc * cz
+    dcp_dt = 0 - ((Q3 * cp)/V) + (2 * k  * cc * cz)
     # print(f"dcc_dt: {dcc_dt}")
     dcdt = [dcz_dt, dcc_dt, dcp_dt]
     dcdt = np.array(dcdt)
@@ -303,9 +303,9 @@ def Jf(t, c):
     ####################
     cz, cc, cp = c
     dfdc = [
-        -Q3 / V - k * cc, -k * cz, 0,
-        -k * cc, -Q3 / V - k * cz, 0,
-        2 * k * cc, 2 * k * cz, -Q3
+        -Q3 / V - k * cc,  -k * cz,  0,
+        -k * cc,  -Q3 / V - k * cz,  0,
+        2 * k * cc, 2 * k * cz, -Q3/V
     ]
 
     dfdc = np.array(dfdc).reshape(3, 3)
