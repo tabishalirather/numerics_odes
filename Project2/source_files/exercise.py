@@ -193,37 +193,34 @@ def twostep(f, Jf, y0, y1, t, a, b):
         y[1] = y_app[1]
         y1 = y[1]
 
-
     # if len(b) == 2 or b[2] == 0:  # Explicit two step method
     #     we don't need to write separate code here, we can just set b2=0 in the implicit method and it'll work.
 
+    # if(1==1):
+    for n in range(len(t) - 2):
+        h = t[n + 1] - t[n]
+        f_n = f(t[n], y[n])
+        f_n1 = f(t[n + 1], y[n + 1])
+        const_S = a[0] * y[n] + a[1] * y[n + 1] - h * (b[0] * f_n + b[1] * f_n1)
 
+        def F(y):
+            return a[2] * y - h * b[2] * f(t[n + 2], y) + const_S
 
-    if(1==1):
-        for n in range(len(t) - 2):
-            h = t[n + 1] - t[n]
-            f_n = f(t[n], y[n])
-            f_n1 = f(t[n + 1], y[n + 1])
-            const_S = a[0] * y[n] + a[1] * y[n + 1] - h * (b[0] * f_n + b[1] * f_n1)
+        def JF(y):
+            if (callable(Jf)):
+                return a[2] * np.identity(dim) - h * b[2] * Jf(t[n + 2], y)
+            else:
+                return a[2] * np.identity(dim)
 
-            def F(y):
-                return a[2] * y - h * b[2] * f(t[n + 2], y) + const_S
-
-            def JF(y):
-                if(callable(Jf)):
-                    return a[2] * np.identity(dim) - h * b[2] * Jf(t[n + 2], y)
-                else:
-                    return a[2] * np.identity(dim)
-
-            z_initial_guess = y[n + 1]
-            newton_update = 1 * np.identity(dim)  # Das ist eine vector
-            while np.linalg.norm(newton_update) > 1e-8:
-                newton_update = np.linalg.solve(JF(z_initial_guess), F(z_initial_guess))  #
-                z_initial_guess = z_initial_guess - newton_update
-            y[n + 2] = z_initial_guess
-            # print(f"y[n+2] is: {y[n+2]}")
-            # y = np.array(y)
-            # print(f"y1_values array is: {y1_values[0]}")
+        z_initial_guess = y[n + 1]
+        newton_update = 1 * np.identity(dim)  # Das ist eine vector
+        while np.linalg.norm(newton_update) > 1e-8:
+            newton_update = np.linalg.solve(JF(z_initial_guess), F(z_initial_guess))  #
+            z_initial_guess = z_initial_guess - newton_update
+        y[n + 2] = z_initial_guess
+        # print(f"y[n+2] is: {y[n+2]}")
+        # y = np.array(y)
+        # print(f"y1_values array is: {y1_values[0]}")
     return y
 
 
@@ -257,13 +254,13 @@ def f(t, c):
     # edit the code here#
     ####################
     cz, cc, cp = c
-    dcz_dt = ((Q1 * cz0)/V) - ((Q3 * cz)/V) - (k  * cc * cz)
+    dcz_dt = ((Q1 * cz0) / V) - ((Q3 * cz) / V) - (k * cc * cz)
     # print(f"dcz_dt : {dcz_dt}")
 
-    dcc_dt = ((Q2 * cc0)/V) - ((Q3 * cc)/V) - (k  * cc * cz)
+    dcc_dt = ((Q2 * cc0) / V) - ((Q3 * cc) / V) - (k * cc * cz)
     # print(f"dcc_dt: {dcc_dt}")
 
-    dcp_dt = 0 - ((Q3 * cp)/V) + (2 * k  * cc * cz)
+    dcp_dt = 0 - ((Q3 * cp) / V) + (2 * k * cc * cz)
     # print(f"dcc_dt: {dcc_dt}")
     dcdt = [dcz_dt, dcc_dt, dcp_dt]
     dcdt = np.array(dcdt)
@@ -303,9 +300,9 @@ def Jf(t, c):
     ####################
     cz, cc, cp = c
     dfdc = [
-        -Q3 / V - k * cc,  -k * cz,  0,
-        -k * cc,  -Q3 / V - k * cz,  0,
-        2 * k * cc, 2 * k * cz, -Q3/V
+        -Q3 / V - k * cc, -k * cz, 0,
+        -k * cc, -Q3 / V - k * cz, 0,
+        2 * k * cc, 2 * k * cz, -Q3 / V
     ]
 
     dfdc = np.array(dfdc).reshape(3, 3)

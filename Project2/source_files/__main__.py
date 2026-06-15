@@ -2,10 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 from exercise import *
+import timeit
 
 # ---------------------------------------------------------------------
 # main program
 # ---------------------------------------------------------------------
+path = "/mnt/36C22184C2214987/Coursework/TUHH/Numerics for ODEs/Code/Project2/results/"
 
 V = 25  # biochemical reactor volume [m^3]
 Q1 = 2.5  # discharge of the first pipe [m^3/min]
@@ -47,6 +49,31 @@ for i in range(len(h)):
     y_AM2 = twostep(f, Jf, y0, [], t, a_AM2, b_AM2)
     y_BDF2 = twostep(f, Jf, y0, [], t, a_BDF2, b_BDF2)
 
+    methods = {
+        'Explicit\nEuler': lambda: euler_expl(f, y0, t),
+        'Improved\nEuler': lambda: euler_impr(f, y0, t),
+        'AB2': lambda: twostep(f, [], y0, [], t, a_AB2, b_AB2),
+        'AM2': lambda: twostep(f, Jf, y0, [], t, a_AM2, b_AM2),
+        'BDF2': lambda: twostep(f, Jf, y0, [], t, a_BDF2, b_BDF2),
+    }
+    times = {}
+    for name, method in methods.items():
+        t_sec = timeit.timeit(method, number=10) / 10
+        times[name] = t_sec
+
+    fig, ax = plt.subplots(figsize=(7, 4))
+    bars = ax.bar(times.keys(), times.values(), color=['#4C72B0', '#DD8452', '#55A868', '#C44E52', '#8172B2'],
+                  edgecolor='black', linewidth=0.7, width=0.5)
+    ax.bar_label(bars, fmt='%.3f s', padding=3, fontsize=11)
+    ax.set_title('Computation time per method', fontsize=13)
+    ax.set_ylabel('Time (s)', fontsize=12)
+    ax.set_ylim(0, max(times.values()) * 1.2)
+    ax.yaxis.grid(True, linestyle='--', alpha=0.7)
+    ax.set_axisbelow(True)
+    plt.rcParams.update({'font.size': 12})
+    plt.tight_layout()
+    plt.savefig(path + 'speed.png', dpi=150)
+
     col = 2
     # absolute error for vaccine product concentration
     cp_err[i, :] = np.array([np.max(np.abs(y_euler_expl[:, col] - y_app[:, col])),
@@ -56,6 +83,7 @@ for i in range(len(h)):
                              np.max(np.abs(y_BDF2[:, col] - y_app[:, col]))])
 
 # Display y(te) for final step size
+# print(times)
 m = len(t) - 1
 print('Concentrations c = (c_Z,c_C,c_P) at t_end = 30 min for h = ', h_, '\n')
 print('     odeint : ', y_app[m, :])
@@ -68,7 +96,6 @@ print('       BDF2 : ', y_BDF2[m, :])
 # --------------------------------------------------------------------------
 # plot concentrations c_z(t), c_C(t), c_P(t)  [for h(end)]
 # --------------------------------------------------------------------------
-path = "/mnt/36C22184C2214987/Coursework/TUHH/Numerics for ODEs/Code/Project2/results/"
 fs = 15  # FontSize
 title = ['Virus concentration', 'Chemical concentration', 'Vaccine product concentration']
 ylabel = ['$c_Z$', '$c_C$', '$c_P$']
@@ -96,6 +123,8 @@ for i in range(5):
     plt.loglog(h, cp_err[:, i], markers[i], label=labels[i], markersize=8, linewidth=1.5)
 plt.title('Error vs stepsize for c_P')
 plt.legend(['Explicit Euler', 'Improved Euler', 'AB2', 'AM2', 'BDF2'], loc='best')
+plt.legend(loc='upper left', fontsize=11, framealpha=0.9, edgecolor='gray', bbox_to_anchor=(1, 1))
+plt.tight_layout()
 plt.xlabel('h')
 plt.ylabel('Error')
 plt.grid()
