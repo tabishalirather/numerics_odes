@@ -20,7 +20,7 @@ R = 7/9
 S = 0.01
 f_ = lambda t,w : f(t,w,R,S)
 Jf_ = lambda t,w : Jf(t,w,R,S)
-#Jf_ = []
+# Jf_ = []
 
 h = 0.001                  
 N = int((te-t0)/h)
@@ -110,10 +110,12 @@ plt.savefig(path + 'stepsizes.png')
 # phase portrait y_1 vs. y2
 #--------------------------------------------------------------------------
 
+
+# How does this make any sense? The phase potraits when compared to the one in paper reference [1]
 w79 = w_exact(t,7/9,0.3,w0)
 w43 = w_exact(t,4/3,0.3,w0)
 
-fig, axs = plt.subplots(1,2, figsize=(8, 4))
+fig, axs = plt.subplots(1,2, figsize=(10, 10))
 axs[0].plot(w79[:,0],w79[:,1])
 axs[0].set_xlabel('$y_1$')
 axs[0].set_ylabel('$y_2$')
@@ -142,7 +144,7 @@ plt.savefig(path + 'trajectory.png')
 # a = np.array([0]); B = np.array([0]); c = np.array([1]); txt = 'expl. Euler'                                # explicit Euler
 # a = np.array([0,1/2]); B = np.array([[0,0],[1/2,0]]); c = np.array([0,1]); txt = 'impr. Euler'              # improved Euler 
 # a = np.array([0,1]); B = np.array([[0,0],[1,0]]); c = np.array([1/2,1/2]); txt = 'Heun-2'                   # Heun-2    
-# a = np.array([0,2/3]); B = np.array([[0,0],[2/3,0]]); c = np.array([1/4,3/4]); txt = 'Ralston'              # Ralston
+a = np.array([0,2/3]); B = np.array([[0,0],[2/3,0]]); c = np.array([1/4,3/4]); txt = 'Ralston'              # Ralston
 #a = np.array([0,1,2])/3; B = np.array([[0,0,0],[1,0,0],[0,2,0]])/3; c = np.array([1,0,3])/4; txt = 'Heun-3'  # Heun-3
 #a = np.array([0,1,1,2])/2; B = np.array([[0,0,0,0],[1,0,0,0],[0,1,0,0],[0,0,1,0]])/2; c = np.array([1,2,2,1])/6; txt = 'classic RKM' # classical Runge-Kutta
 #--------------------------------------------------------------------------
@@ -152,7 +154,7 @@ plt.savefig(path + 'trajectory.png')
 #--------------------------------------------------------------------------
 # a = np.array([1]); B = np.array([1]); c = np.array([1]); txt = 'impl. Euler'                                                        # implicit Euler
 #a = np.array([0,1]); B = np.array([[0,0],[1/2,1/2]]); c = np.array([1/2,1/2]); txt = 'Trapezoidal rule'                              # Trapezoidal rule 
-z = 1/(2*np.sqrt(3)); a = np.array([1/2+z,1/2-z]); B = np.array([[1/2+z,0],[-2*z,1/2+z]]); c = np.array([1/2,1/2]); txt = 'Norsett'   # Norsett formula    
+# z = 1/(2*np.sqrt(3)); a = np.array([1/2+z,1/2-z]); B = np.array([[1/2+z,0],[-2*z,1/2+z]]); c = np.array([1/2,1/2]); txt = 'Norsett'   # Norsett formula
 # a = np.array([0,2/3]); B = np.array([[0,0],[1/3,1/3]]); c = np.array([1/4,3/4]); txt = 'Hammer & Hollingsworth'                     # Hammer & Hollingsworth
 #a = np.array([0,1/2,1]); B = np.array([[0,0,0],[1/4,1/4,0],[0,1,0]]); c = np.array([1/6,2/3,1/6]); txt = 'Lobatto-IIIC*'             # Lobatto-IIIC*
 #z = 2/np.sqrt(3) * np.cos(np.pi/18); a = np.array([(1+z)/2,1/2,(1-z)/2]); 
@@ -201,10 +203,10 @@ plt.savefig(path + 'Runge_Kutta_method.png')
 
 # # Adams-Moulton
 # a = np.array([-1,1]); b = np.array([1,1])/2; txt = 'AM-1'                                       # AM-1
-# a = np.array([0,-1,1]); b = np.array([-1,8,5])/12; txt = 'AM-2'                                 # AM-2
+a = np.array([0,-1,1]); b = np.array([-1,8,5])/12; txt = 'AM-2'                                 # AM-2
 # a = np.array([0, 0,-1,1]); b = np.array([1,-5,19,9])/24; txt = 'AM-3'                           # AM-3
 # a = np.array([0,0,0,-1,1]); b = np.array([-19,106,-264,646,251])/720; txt = 'AM-4'              # AM-4
-a = np.array([0,0,0,0,-1,1]); b = np.array([27,-173,482,-789,1427,475])/1440; txt = 'AM-5'        # AM-5
+# a = np.array([0,0,0,0,-1,1]); b = np.array([27,-173,482,-789,1427,475])/1440; txt = 'AM-5'        # AM-5
 
 # # Milne-Simpson
 # a = np.array([-1,0,1]); np.array(b = [1,4,1])/3; txt = 'MS-2'                                   # MS-2
